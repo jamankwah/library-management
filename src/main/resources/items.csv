@@ -1,0 +1,14 @@
+type,id,title,extra
+BOOK,B001,Clean Code,Robert C. Martin
+BOOK,B002,Effective Java,Joshua Bloch
+BOOK,B003,Head First Design Patterns,Eric Freeman
+BOOK,B004,The Pragmatic Programmer,Andrew Hunt
+BOOK,B005,Refactoring,Martin Fowler
+MAGAZINE,M001,National Geographic,245
+MAGAZINE,M002,Science et Vie,1290
+MAGAZINE,M003,Wired,31
+DVD,D001,Inception,148
+DVD,D002,The Matrix,136
+DVD,D003,Interstellar,169
+POSTER,P001,Old Map,none
+MAGAZINE,M004,Le Monde Diplomatique,abc
