@@ -1,26 +1,28 @@
 package com.library;
 
-import com.library.model.Book;
-import com.library.model.Dvd;
-import com.library.model.LibraryItem;
-import com.library.model.Magazine;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.library.exception.InvalidAmountException;
+import com.library.model.Member;
+import com.library.model.MembershipType;
 
 public class Application {
 
     public static void main(String[] args) {
-        List<LibraryItem> items = new ArrayList<>();
-        items.add(new Book("B001", "Clean Code", "Robert C. Martin"));
-        items.add(new Magazine("M001", "National Geographic", 245));
-        items.add(new Dvd("D001", "Inception", 148));
+        Member alice = new Member("U001", "Alice Martin", MembershipType.STANDARD);
+        Member bob = new Member("U002", "Bob Dupont", MembershipType.PREMIUM);
 
-        for (LibraryItem item : items) {
-            System.out.println(item);
-            System.out.println("   Loan period: " + item.getMaxLoanDays() + " days");
-            System.out.println("   Fee for 5 days late: " + item.calculateLateFee(5) + " EUR");
-            System.out.println("   Fee for 30 days late: " + item.calculateLateFee(30) + " EUR");
+        System.out.println(alice + " -> can borrow " + alice.getMaxLoans() + " items");
+        System.out.println(bob + " -> can borrow " + bob.getMaxLoans() + " items");
+
+        alice.addFee(4.50);
+        System.out.println("After a late return: " + alice);
+
+        try {
+            alice.payFees(10);
+        } catch (InvalidAmountException e) {
+            System.out.println("Payment refused: " + e.getMessage());
         }
+
+        alice.payFees(4.50);
+        System.out.println("After paying: " + alice);
     }
 }
