@@ -1,8 +1,10 @@
 package com.library;
 
 import com.library.exception.DataLoadException;
-import com.library.loader.ItemCsvLoader;
-import com.library.model.LibraryItem;
+import com.library.loader.LoanCsvLoader;
+import com.library.loader.LoanRecord;
+import com.library.loader.MemberCsvLoader;
+import com.library.model.Member;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -10,27 +12,30 @@ import java.util.List;
 public class Application {
 
     public static void main(String[] args) {
-        ItemCsvLoader loader = new ItemCsvLoader();
+        MemberCsvLoader memberLoader = new MemberCsvLoader();
+        LoanCsvLoader loanLoader = new LoanCsvLoader();
 
         try {
-            List<LibraryItem> items = loader.load(Path.of("src/main/resources/items.csv"));
-            System.out.println(items.size() + " items loaded:");
-            for (LibraryItem item : items) {
-                System.out.println("  " + item);
+            List<Member> members = memberLoader.load(Path.of("src/main/resources/members.csv"));
+            System.out.println(members.size() + " members loaded:");
+            for (Member member : members) {
+                System.out.println("  " + member);
             }
-            for (String warning : loader.getWarnings()) {
+            for (String warning : memberLoader.getWarnings()) {
+                System.out.println("WARNING " + warning);
+            }
+
+            List<LoanRecord> loans = loanLoader.load(Path.of("src/main/resources/loans.csv"));
+            System.out.println(loans.size() + " loan records loaded:");
+            for (LoanRecord loan : loans) {
+                System.out.println("  " + loan.getMemberId() + " borrowed " + loan.getItemId()
+                        + " on " + loan.getBorrowDate());
+            }
+            for (String warning : loanLoader.getWarnings()) {
                 System.out.println("WARNING " + warning);
             }
         } catch (DataLoadException e) {
-            System.out.println("Cannot load items: " + e.getMessage());
-        }
-
-        // Second test: a file that does not exist
-        try {
-            loader.load(Path.of("src/main/resources/missing.csv"));
-        } catch (DataLoadException e) {
-            System.out.println("Cannot load items: " + e.getMessage());
-            System.out.println("Original cause: " + e.getCause().getClass().getSimpleName());
+            System.out.println("Cannot load data: " + e.getMessage());
         }
     }
 }

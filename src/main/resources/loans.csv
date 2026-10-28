@@ -1,0 +1,10 @@
+memberId,itemId,borrowDate
+U001,B001,2026-10-01
+U001,D001,2026-10-20
+U002,M001,2026-10-25
+U002,B002,2026-10-27
+U004,D002,2026-09-15
+U003,B003,2026-10-10
+U001,B001,2026-10-05
+
+//loans that already exist when the library opens
