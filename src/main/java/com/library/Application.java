@@ -9,13 +9,22 @@ import com.library.repository.Repository;
 import com.library.service.DataInitializer;
 import com.library.service.LibraryService;
 import com.library.service.ReportService;
+import com.library.ui.ConsoleMenu;
 
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.util.Scanner;
 
+/**
+ * Entry point. Its only job is to create the objects and connect them together;
+ * all the real work is done by the classes it wires.
+ */
 public class Application {
 
+    private static final String DEFAULT_DATA_FOLDER = "src/main/resources";
+
     public static void main(String[] args) {
+        Path dataFolder = Path.of(args.length > 0 ? args[0] : DEFAULT_DATA_FOLDER);
+
         Repository<LibraryItem> itemRepository = new InMemoryRepository<>(LibraryItem::getId);
         Repository<Member> memberRepository = new InMemoryRepository<>(Member::getId);
         Repository<Loan> loanRepository = new InMemoryRepository<>(Loan::getId);
@@ -25,29 +34,20 @@ public class Application {
         DataInitializer initializer = new DataInitializer(itemRepository, memberRepository, libraryService);
 
         try {
-            initializer.loadAll(Path.of("src/main/resources"));
+            initializer.loadAll(dataFolder);
         } catch (DataLoadException e) {
-            System.out.println("Cannot start the library: " + e.getMessage());
+            System.err.println("Cannot start the library: " + e.getMessage());
+            System.err.println("Cause: " + e.getCause());
             return;
         }
 
         System.out.println("Data loaded: " + itemRepository.findAll().size() + " items, "
                 + memberRepository.findAll().size() + " members, "
                 + libraryService.getActiveLoans().size() + " active loans.");
-        for (String warning : initializer.getWarnings()) {
-            System.out.println("WARNING " + warning);
-        }
+        initializer.getWarnings().forEach(warning -> System.out.println("WARNING " + warning));
 
-        LocalDate today = LocalDate.of(2026, 10, 28);
-        System.out.println();
-        System.out.println("Report on " + today + ":");
-        System.out.printf("  Items available: %.1f%%%n", reportService.getAvailabilityRate());
-        System.out.printf("  Unpaid fees: %.2f EUR%n", reportService.getTotalUnpaidFees());
-        System.out.printf("  Pending late fees: %.2f EUR%n", reportService.getPendingLateFees(today));
-        System.out.println("  Overdue loans:");
-        for (Loan loan : libraryService.getOverdueLoans(today)) {
-            System.out.println("    " + loan + " (" + loan.getDaysLate(today) + " days late)");
+        try (Scanner scanner = new Scanner(System.in)) {
+            new ConsoleMenu(libraryService, reportService, scanner).run();
         }
-        System.out.println("  Members to contact: " + reportService.getNamesOfMembersWithOverdueItems(today));
     }
 }
