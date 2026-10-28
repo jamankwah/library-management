@@ -1,38 +1,34 @@
 package com.library;
 
+import com.library.exception.ItemNotAvailableException;
+import com.library.exception.LibraryException;
 import com.library.model.Book;
-import com.library.model.Dvd;
-import com.library.model.Loan;
-import com.library.model.Member;
-import com.library.model.MembershipType;
-
-import java.time.LocalDate;
+import com.library.model.LibraryItem;
 
 public class Application {
 
     public static void main(String[] args) {
-        Member alice = new Member("U001", "Alice Martin", MembershipType.STANDARD);
-        Book book = new Book("B001", "Clean Code", "Robert C. Martin");
-        Dvd dvd = new Dvd("D001", "Inception", 148);
+        LibraryItem book = new Book("B001", "Clean Code", "Robert C. Martin");
 
-        LocalDate borrowDate = LocalDate.of(2026, 10, 1);
-        Loan bookLoan = new Loan("L001", book, alice, borrowDate);
-        Loan dvdLoan = new Loan("L002", dvd, alice, borrowDate);
+        try {
+            checkAvailable(book);
+            System.out.println("First borrow: OK");
+            book.markAsBorrowed();
 
-        System.out.println(bookLoan);
-        System.out.println(dvdLoan);
+            checkAvailable(book);
+            System.out.println("Second borrow: OK");   // never printed
+        } catch (LibraryException e) {
+            System.out.println("Operation refused: " + e.getMessage());
+            System.out.println("Exception type: " + e.getClass().getSimpleName());
+        }
 
-        LocalDate today = LocalDate.of(2026, 10, 25);
-        System.out.println("On " + today + ":");
-        System.out.println("  Book overdue? " + bookLoan.isOverdue(today)
-                + " - days late: " + bookLoan.getDaysLate(today)
-                + " - fee: " + bookLoan.calculateLateFee(today) + " EUR");
-        System.out.println("  DVD overdue? " + dvdLoan.isOverdue(today)
-                + " - days late: " + dvdLoan.getDaysLate(today)
-                + " - fee: " + dvdLoan.calculateLateFee(today) + " EUR");
+        System.out.println("The program continues normally.");
+    }
 
-        System.out.println("Book returned yet? " + bookLoan.getReturnDate().isPresent());
-        bookLoan.markAsReturned(today);
-        System.out.println("Book returned on: " + bookLoan.getReturnDate().get());
+    // "throws" declares that this method may throw a checked exception (Class 4: throw vs throws)
+    private static void checkAvailable(LibraryItem item) throws ItemNotAvailableException {
+        if (!item.isAvailable()) {
+            throw new ItemNotAvailableException("\"" + item.getTitle() + "\" is already borrowed");
+        }
     }
 }
