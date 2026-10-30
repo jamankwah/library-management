@@ -83,4 +83,35 @@ Every refused operation displays a clear message, and the application never cras
 | `service` | `LibraryService` | Business rules: borrow, return, pay fees, searches |
 | `service` | `ReportService` | Read-only statistics |
 | `service` | `DataInitializer` | Loads all the CSV files at startup |
-| `ui` | `ConsoleMenu` | User interaction:
+| `ui` | `ConsoleMenu` | User interaction: menu, input, messages |
+| — | `Application` | Entry point: creates the objects and connects them |
+
+---
+
+## 5. How to run the tests
+
+The project contains **61 JUnit 5 tests** covering normal cases, edge cases and error cases.
+
+**From IntelliJ IDEA:** right-click `src/test/java` → **Run 'All Tests'**.
+
+**From the command line:**
+
+```bash
+mvn test
+```
+
+Expected result:
+
+```
+Tests run: 61, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
+| Test class | What it tests |
+|---|---|
+| `LibraryItemTest` | Late fees per type, DVD cap, loan periods, availability, validation |
+| `MemberTest` | Fee payment rules, loan limits per membership |
+| `LoanTest` | Due dates, overdue detection, late days, return rules |
+| `LibraryServiceTest` | Borrowing and return rules, every business exception, state after a refusal |
+| `ReportServiceTest` | Availability rate, unpaid and pending fees, members to contact |
+| `ItemCsvLoaderTest` | Loading valid files, skipping invalid lines, missing file |
